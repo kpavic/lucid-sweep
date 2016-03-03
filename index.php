@@ -1,4 +1,13 @@
+<?php
+if(isset($_SESSION['id'])){
+  $log_in_out = 'logout=yes';
+  $username = $_SESSION['username'];
+} else {
+  $log_in_out = 'login=yes';
+  $username='None';
+}
 
+?>
 
 <!doctype html>
 <html>
@@ -21,7 +30,7 @@
                             document.getElementById("results").innerHTML=xmlhttp.responseText;
                                       }
                     }
-            xmlhttp.open("GET","lucid-tube.php?search="+str,true);
+        xmlhttp.open("GET","lucid-tube.php?username=<?= $username ?>&search="+str,true);
               xmlhttp.send();
       }
     </script>
@@ -30,7 +39,7 @@
     <div id="navigation">
       <a style="float: left;" href="index.php">Fake Youtube</a>
       <a href="favorites.php">My videos</a>
-      <a href="logout.php">Logout</a>
+      <a href="login.php?<?= $log_in_out ?>">Logout</a>
     </div>
     <div id="main_search">
       <input type="search" id="search" name="search" size="100" onkeyup="getResult(this.value)" onmousedown="getResult(this.value)" placeholder="Unesite pojam pretrage" >
