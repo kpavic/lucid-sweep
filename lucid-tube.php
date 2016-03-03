@@ -56,6 +56,20 @@
 
         return $htmlBody;
     }
+        function get_vid_info($video_id){
+          $getSnippet = $this->youtube->videos->listVideos("snippet", array('id' => $video_id));
+          $video_title = $getSnippet[0]['snippet']['title'];
+          $video_description = $getSnippet[0]['snippet']['description'];
+
+          $htmlBody = sprintf('<iframe width="640" height="480"
+                                 src="http://www.youtube.com/embed/%s?autoplay=1">
+                               </iframe>', $video_id);
+
+          $result = [$video_title, $video_description, $htmlBody];
+          return $result;
+
+          }
+
 
   }
 $lucid = new LucidTube();
