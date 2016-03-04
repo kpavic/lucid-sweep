@@ -15,7 +15,7 @@
       $this->maxResults = "50";
     }
 
-    function search_vids($q, $maxResults){
+    function search_vids($q, $maxResults, $user){
 
       $searchResponse = $this->youtube->search->listSearch('id,snippet', 
             ['q' => $q,
@@ -26,6 +26,13 @@
       $elements = [];
       $videos = '';
 
+      if($user != 'None'){
+        $addToFavorites = 'onmousedown="addFavorite(this.id)" onclick="addFavorite(this.id)" 
+                           style="border:1px solid black;"> +<br/>Dodaj u<br/>favorite';
+      } else {
+        $addToFavorites = '>';
+      }
+
       foreach ($searchResponse['items'] as $searchResult) {
         $elements[$searchResult['id']['videoId']] = [
             'id' => $searchResult['id']['videoId'],
@@ -33,17 +40,12 @@
             'thumbnail' => $searchResult['snippet']['thumbnails']['default']['url'],
             'description' => $searchResult['snippet']['description'],
              ];
-        $videos .= sprintf('<tr><td>
-                                  <p class="favorite" id="%s" onclick="addFavorite(%s)" style="border:1px solid black;">
-                                     +<br/>Dodaj u<br/>favorite
-                                  </p>
+        $videos .= sprintf('<tr><td class="favorite" id="%s"'.$addToFavorites.'
                                 </td>
                                 <td><a href="play.php?video=%s"><img src="%s"/></a></td>
                                 <td><b>%s</b> <br/><pi style="color : grey"> %s </p></td>
                             </tr>',
-                           end($elements)['id'], 
-                           end($elements)['id'], 
-                           end($elements)['id'], 
+                           end($elements)['id'], end($elements)['id'], 
                            end($elements)['thumbnail'], 
                            end($elements)['title'], 
                            end($elements)['description']
@@ -73,21 +75,20 @@
       $videos = '';
 
       foreach ($videoList['items'] as $searchResult) {
-        $elements[$searchResult['id']['videoId']] = [
-        'id' => $searchResult['id']['videoId'],
+        $elements[$searchResult['id']] = [
+        'id' => $searchResult['id'],
         'title' => $searchResult['snippet']['title'],    
         'thumbnail' => $searchResult['snippet']['thumbnails']['default']['url'],
         'description' => $searchResult['snippet']['description'],
         ];
       $videos .= sprintf('<tr><td>
-                                <p class="favorite" id="%s" onclick="removeFavorite(%s)" style="border:1px solid black;">
+                                <p class="favorite" id="%s" onclick="removeFavorite(this.id)" style="border:1px solid black;">
                                    -<br/>Ukloni iz<br/>favorita
                                 </p>
                               </td>
                               <td><a href="play.php?video=%s"><img src="%s"/></a></td>
                               <td><b>%s</b> <br/><pi style="color : grey"> %s </p></td>
                           </tr>',
-                         end($elements)['id'], 
                          end($elements)['id'], 
                          end($elements)['id'], 
                          end($elements)['thumbnail'], 
@@ -102,10 +103,26 @@
     }
 
   }
+
+session_start();
+
 $lucid = new LucidTube();
 
-if ($_GET['search']) {
-    echo $lucid->search_vids($_GET['search'], '50');
+if (isset($_GET['search'])) {
+    if(isset($_SESSION['user_id'])) {
+      $user = $_SESSION['user_id'];
+    } else {
+      $user = "None";
+    }
+    echo $lucid->search_vids($_GET['search'], '50', $user);
+}
+
+if (isset($_GET['list_favorites']) && isset($_SESSION['user_id'])) {
+    include 'lucid-data.php';
+    $lucid_data = new LucidData();
+    $vid_list = $lucid_data->fetch_favorites($_SESSION['user_id']);
+
+    echo $lucid->get_vid_list($vid_list);
 }
 
 ?>

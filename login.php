@@ -1,13 +1,17 @@
 <?php
+session_start();
 include 'lucid-database.php';
+$error = '';;
 
-if(isset($_SESSION['id']) && $_GET['logout']=='yes'){
+if(isset($_SESSION['user_id']) && isset($_GET['logout'])){
   unset($_SESSION['id']);
+  session_destroy ();
+  header("location: index.php");
 
-} elseif(!isset($_SESSION['id'])&&($_GET['login']=='yes')){
-  // Prepare login data
+} elseif(!isset($_SESSION['user_id'])&&(isset($_GET['login']))){
+  // Stub - do nothing for now
   
-} elseif(isset($_POST['username']) && isset($_POST['password']))
+} elseif(isset($_POST['username']) && isset($_POST['password'])) {
   // Login user if username and password matches
   $username = $_POST['username'];
   $password = $_POST['password'];
@@ -17,11 +21,16 @@ if(isset($_SESSION['id']) && $_GET['logout']=='yes'){
   
   if($login==TRUE){
     session_start();
-    $_SESSION['username']= $username;
+
+    $_SESSION['user_id'] = $lucid_data->get_user_id($username);
+    $_SESSION['username'] = $username;
+
     header("location: index.php");
+
   } else {
     $error = "Unijeli ste neispravne podatke!";
   }
+}
 
 ?>
 
@@ -36,7 +45,7 @@ if(isset($_SESSION['id']) && $_GET['logout']=='yes'){
   <div id="navigation">
     <a style="float: left;" href="index.php">Fake Youtube</a>
     <a href="favorites.php">My videos</a>
-    <a href="logout.php">Logout</a>
+    <a href="login.php">Login</a>
   </div>
 
   <div id="main_search">

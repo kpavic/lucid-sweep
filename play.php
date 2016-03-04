@@ -1,7 +1,6 @@
 <?php
   $htmlBody = '';
-  $action = 'add';
-  if ($_GET['video']) {
+  if (isset($_GET['video'])) {
     include 'lucid-tube.php';
 
     $video_id = $_GET['video'];
@@ -22,23 +21,23 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Fake Youtube</title>
     <script>
-      function addFavorite(str, action) {
+      function addFavorite(str) {
         if (str.length==0) { 
-              document.getElementById("addfavorite").innerHTML="+<br/>Dodaj u<br/>favorite";
-                      return;
-                        }
-        if (window.XMLHttpRequest) {
-                xmlhttp=new XMLHttpRequest();
-                  } else {
-                          xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-                            }
+          return;
+        } else {
+          if (window.XMLHttpRequest) {
+            xmlhttp=new XMLHttpRequest();
+          } else {
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+          }
           xmlhttp.onreadystatechange=function() {
-                  if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                            document.getElementById("results").innerHTML=xmlhttp.responseText;
-                                      }
-                    }
-            xmlhttp.open("GET","db_control.php?addfavorite="+str,true);
-              xmlhttp.send();
+            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+              document.getElementById(str).innerHTML=xmlhttp.responseText;
+            }
+          }
+          xmlhttp.open("GET","lucid-database.php?favorite="+str,true);
+          xmlhttp.send();
+        }
       }
     </script>
   </head>
@@ -52,9 +51,9 @@
     <?=$htmlBody?>
     <p>
        <b><?= $video_title ?></b> <br/>
-       <?= $video_description ?>
+       <p style="color: grey"><?= $video_description ?></p>
     </p>
-    <p id="addfavorite" class="favorite" onclick="addFavorite(<?= $video_id ?>, <?= $action ?>)" style="border:1px solid black;">
+    <p id="<?= $video_id ?>" class="favorite" onclick="addFavorite(this.id)" style="border:1px solid black;">
       +<br/>Dodaj u<br/>favorite
     </p>
     </div>
