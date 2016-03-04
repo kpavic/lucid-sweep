@@ -5,8 +5,23 @@
   require_once 'Google/Service/YouTube.php';
 
 
+  /**
+   * Handles YouTube API v3 requests
+   *
+   * Handles search, information retrieval (list or single) requests
+   * for YouTube videos 
+   *
+   * Uses a developer key obtained at Google API developer site
+   *
+   */
   class LucidTube {
 
+    /**
+     * Initializes the class with default values
+     *
+     * Initializes the LucidTube class with default values.
+     * Uses a developer key obtained at Google API developer site
+     */
     function __construct() {
       $this->DEVELOPER_KEY = 'AIzaSyAI5P9HN_9iucCWjOd-AH3j_5CRJ7ljKyQ';
       $this->client = new Google_Client();
@@ -15,6 +30,19 @@
       $this->maxResults = "50";
     }
 
+    /**
+     * Searches YouTube videos, returns a html table with video thumbnails,
+     * titles and descriptions and optional favorite links
+     *
+     * Searches for YouTube videos using <var>q>/var> as a search pattern.
+     * <var>maxResults</var> sets maximum number of results (max 50).
+     *
+     * Returns html table with video information - thumbnails(with link to play the video), 
+     * titles and descriptions.
+     *
+     * If <var>user</var> is not None, adds a button to add the video to favorites for
+     * each video in the html table. 
+     */
     function search_vids($q, $maxResults, $user){
 
       $searchResponse = $this->youtube->search->listSearch('id,snippet', 
@@ -57,6 +85,14 @@
 
     }
 
+    /**
+     * Retrieves information for a single video from YouTube
+     *
+     * Retrieves video information according to the <var>video_id</var>.
+     *
+     * Returns video title, description and html code for embedded video (iframe) which can be used
+     * to play the video.
+     */
     function get_vid_info($video_id){
       $getSnippet = $this->youtube->videos->listVideos("snippet", array('id' => $video_id));
       $video_title = $getSnippet[0]['snippet']['title'];
@@ -70,6 +106,15 @@
       return $result;
     }
       
+    /**
+     * Retrieves information for a given list of video ids from YouTube
+     *
+     * Retrieves YouTube video information according to the <var>video_ids</var>, which should be a 
+     * csv list of video ids.
+     *
+     * Returns a html table with video thumbails(with link to play video), titles and descriptions
+     * for each requested video.
+     */
     function get_vid_list($video_ids){
       $videoList = $this->youtube->videos->listVideos("id, snippet", array('id' => $video_ids));
       $videos = '';

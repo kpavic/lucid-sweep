@@ -1,17 +1,37 @@
 <?php
-  $htmlBody = '';
-  if (isset($_GET['video'])) {
-    include 'lucid-tube.php';
 
-    $video_id = $_GET['video'];
+session_start();
 
-    $lucid = new LucidTube();
+$htmlBody = '';
+$video_id = '';
+$addToFavorites = '<p></p>';
 
-    $result = $lucid->get_vid_info($video_id);
-    $video_title = $result['0'];
-    $video_description = $result['1'];
-    $htmlBody = $result['2'];
+if (isset($_GET['video'])) {
+  include 'lucid-tube.php';
 
+  $video_id = $_GET['video'];
+
+  $lucid = new LucidTube();
+
+  $result = $lucid->get_vid_info($video_id);
+  $video_title = $result['0'];
+  $video_description = $result['1'];
+  $htmlBody = $result['2'];
+
+}
+
+if (isset($_SESSION['user_id'])){
+  $log_in_out = 'logout=yes';
+  $username = $_SESSION['username'];
+  $login = 'Logout';
+  $addToFavorites = '<p id="'.$video_id.'" class="favorite" onclick="addFavorite(this.id)" 
+                        style="border:1px solid black;">
+                       +<br/>Dodaj u<br/>favorite
+                     </p>';
+} else {
+  $log_in_out = 'login=yes';
+  $username='None';
+  $login='Login';
 }
 ?>
 
@@ -45,7 +65,7 @@
     <div id="navigation">
       <a style="float: left;" href="index.php">Fake Youtube</a>
       <a href="favorites.php">My videos</a>
-      <a href="logout.php">Logout</a>
+      <a href="login.php?<?= $log_in_out ?>"><?= $login ?></a>
     </div>
     <div id="main_search">
     <?=$htmlBody?>
@@ -53,9 +73,7 @@
        <b><?= $video_title ?></b> <br/>
        <p style="color: grey"><?= $video_description ?></p>
     </p>
-    <p id="<?= $video_id ?>" class="favorite" onclick="addFavorite(this.id)" style="border:1px solid black;">
-      +<br/>Dodaj u<br/>favorite
-    </p>
+    <?= $addToFavorites ?>
     </div>
   </body>
 </html>
